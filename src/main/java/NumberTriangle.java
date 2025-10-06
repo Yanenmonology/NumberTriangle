@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * This is the provided NumberTriangle class to be used in this coding task.
@@ -88,8 +89,19 @@ public class NumberTriangle {
      *
      */
     public int retrieve(String path) {
-        // TODO implement this method
-        return -1;
+        int result = 0;
+        if (path.isEmpty()) {
+            result = this.getRoot();
+        }
+        else if (path.charAt(0) == 'r') {
+            String nPath = path.substring(1);
+            result = this.right.retrieve(nPath);
+        }
+        else if (path.charAt(0) == 'l') {
+            String nPath = path.substring(1);
+            result = this.left.retrieve(nPath);
+        }
+        return result;
     }
 
     /** Read in the NumberTriangle structure from a file.
@@ -109,25 +121,36 @@ public class NumberTriangle {
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
-
-        // TODO define any variables that you want to use to store things
-
+        ArrayList<ArrayList<NumberTriangle>> grandList = new ArrayList<>();
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
         NumberTriangle top = null;
 
         String line = br.readLine();
         while (line != null) {
-
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
-
-            // TODO process the line
-
+            String[] parts = line.trim().split("\\s+");
+            ArrayList<NumberTriangle> nums = new ArrayList<>();
+            for (int i = 0; i < parts.length; i++) {
+                NumberTriangle tn = new NumberTriangle(Integer.parseInt(parts[i]));
+                nums.add(tn);
+            }
+            grandList.add(nums);
             //read the next line
             line = br.readLine();
         }
         br.close();
+        for (int r = 0; r < grandList.size() - 1; r++) {
+            ArrayList<NumberTriangle> currentRow = grandList.get(r);
+            ArrayList<NumberTriangle> nextRow = grandList.get(r + 1);
+
+            // Step 2: link each node in currentRow to its two children
+            for (int c = 0; c < currentRow.size(); c++) {
+                NumberTriangle n = currentRow.get(c);
+                n.setLeft(nextRow.get(c));// child directly below-left
+                n.setRight(nextRow.get(c + 1));// child directly below-right
+            }
+        }
+        top = grandList.get(0).get(0);
         return top;
     }
 
@@ -140,5 +163,6 @@ public class NumberTriangle {
         // Problem 18 from project Euler [not for credit]
         mt.maxSumPath();
         System.out.println(mt.getRoot());
+        System.out.println(mt.retrieve("lr"));
     }
 }
