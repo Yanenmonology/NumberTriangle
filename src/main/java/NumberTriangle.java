@@ -89,6 +89,9 @@ public class NumberTriangle {
      *
      */
     public int retrieve(String path) {
+        //substring is fixed for repushing the branch
+        //sub string was operated without checking
+        //resulting in out of bound index error.
         int result = 0;
         if (path.isEmpty()) {
             result = this.getRoot();
